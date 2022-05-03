@@ -1,0 +1,60 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+  inlet
+  {
+      type         uniformFixedValue;
+      uniformValue
+      {
+          type             tableFile;
+          format           csv;
+          nHeaderLine      0;              // number of header lines
+          refColumn        0;              // time column index
+          componentColumns (1 2 3);            // data column index
+          separator        ";";            // optional (defaults to ",")
+          mergeSeparators  no;             // merge multiple separators
+          //interpolationScheme linear;    // options are linear and spline.
+          file             "./data/clamp_17_DataTable.csv";
+     }
+  }
+
+    outlet
+    {
+        type            zeroGradient;
+    }
+
+    top
+    {
+        type            symmetryPlane;
+    }
+
+    ground
+    {
+        type            noSlip;
+    }
+
+    frontAndBack
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //

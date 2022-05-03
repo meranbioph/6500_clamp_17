@@ -1,0 +1,79 @@
+#!/bin/sh
+cd ${0%/*} || exit 1  # Run from this directory
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+###############################
+# Allrun cont for clamp_17
+# That is, this Allrun file picks up a simulation and continues with it
+# This is a Shell script, so it uses # to comment out text
+# to make this an exectuable file, in shell in the case directory, run: chmod +x Allrun
+# run the Allrun file, in Shell in the case directory, run: ./Allrun
+# The first line of this file tells Ubuntu to run the shell, I think.
+# The second line sets the working directory
+###############################
+
+# To get this Allrun to work;
+## ensure that the highest timestep in clamp_17_02 is 900 more than in clamp_17_01
+## ensure that the two sub-subcases in these two subcases don't have any log (numbered) directories in them
+## ensure that there are no log.--- files in /clamp_17
+
+# To work out the loopi number to start at:
+## highest log folder number in clamp_17_01 / 900 + 2. So, eg, 64800 / 900 = 72, + 2 = 74
+
+###############################
+# enter the loop proper
+
+loopi=174 # see above. [= row 347 in the new system. When loopi = 174, the last completed U loop = 346]
+
+# Start loop
+while [ $loopi -le 430 ]                  # Number of loops = hours / 4, 96 = day
+do
+  # to find C4. NR is the line number (there is a header, so the 4 of C4 is row 5), $4 is the fourth column. How to reference the right file...
+  wtw=$(awk -F ";" -v loopj="$(($loopi*2-1))" '{if(NR==loopj) print $6;}' ./data/clamp_17_DataTable.csv)
+
+  # if wtw is same, take latest pU file to right subsubfolder. Otherwise, take 0_orig. I DON'T THINK THAT THIS IS ACTUALLY NEEDED... (WAS CONCERNED ABOUT INLETS, AS THEY ARE MAPPED AS PATCHES IN PARAVIEW)
+  if $( awk -F ";" -v loopj="$(($loopi*2-1))" '{if(NR==loopj) print $8;}' ./data/clamp_17_DataTable.csv )
+  then
+    cp -r ./clamp_17_01/0_orig ./clamp_17_01/clamp_17_01_"$wtw"/$((($loopi-2)*900 + 810))
+  else
+    cp -r ./clamp_17_01/$((($loopi-2)*900)) ./clamp_17_01/clamp_17_01_"$wtw"/$((($loopi-2)*900 + 810))
+  fi
+
+  # run pimpleFoam for one second with dt = 0.001
+  rm ./clamp_17_01/clamp_17_01_"$wtw"/system/controlDict
+  cp -r ./clamp_17_01/system/controlDict_start ./clamp_17_01/clamp_17_01_"$wtw"/system/controlDict
+  runApplication pimpleFoam -case ./clamp_17_01/clamp_17_01_"$wtw"
+  rm ./log.pimpleFoam
+
+  # run pimpleFoam with variable timestep
+  rm ./clamp_17_01/clamp_17_01_"$wtw"/system/controlDict
+  cp -r ./clamp_17_01/system/controlDict ./clamp_17_01/clamp_17_01_"$wtw"/system/controlDict
+  if $( awk -F ";" -v loopj="$(($loopi*2-1))" '{if(NR==loopj) print $7;}' ./data/clamp_17_DataTable.csv )
+  then
+    sed -i 's/adjustTimeStep  yes/adjustTimeStep  no/' ./clamp_17_01/clamp_17_01_"$wtw"/system/controlDict
+  fi
+  runApplication pimpleFoam -case ./clamp_17_01/clamp_17_01_"$wtw"
+
+  mv ./clamp_17_01/clamp_17_01_"$wtw"/$((($loopi-2)*900)) ./clamp_17_01/$((($loopi-1)*900))
+  rm -r ./clamp_17_01/clamp_17_01_"$wtw"/$((($loopi-2)*900+810))
+  rm -r ./clamp_17_01/clamp_17_01_"$wtw"/$((($loopi-2)*900+811))
+
+  runApplication mapFields -case ./clamp_17_02 -consistent ./clamp_17_01
+  cp ./clamp_17_01/$((($loopi-1)*900))/phi ./clamp_17_02/$((($loopi-1)*900))/phi
+
+  cp -r ./clamp_17_02/$((($loopi-1)*900)) ./clamp_17_02/clamp_17_02_"$wtw"/$((($loopi)*900))
+  runApplication clampPimpleFoam -case ./clamp_17_02/clamp_17_02_"$wtw"
+
+  mv ./clamp_17_02/clamp_17_02_"$wtw"/$((($loopi)*900)) ./clamp_17_02/$((($loopi)*900))
+  rm -r ./clamp_17_02/clamp_17_02_"$wtw"/$((($loopi-1)*900))
+
+  rm ./log.mapFields
+  rm ./log.pimpleFoam
+  rm ./log.clampPimpleFoam
+
+  loopi=$(($loopi + 1))
+
+  # end loop
+done

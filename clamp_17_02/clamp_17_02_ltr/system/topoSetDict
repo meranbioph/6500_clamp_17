@@ -1,0 +1,164 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  8
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      topoSetDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+    {
+        name    clamp_set;
+        type    cellSet;
+        action  new;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name clamp_0;
+        };
+    }
+    {
+        name    clamp_set;
+        type    cellSet;
+        action  add;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name clamp_1;
+        };
+    }
+    {
+        name    clamp_set;
+        type    cellSet;
+        action  add;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name clamp_2;
+        };
+    }
+    {
+        name    clamp_set;
+        type    cellSet;
+        action  add;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name clamp_3;
+        };
+    }
+    {
+        name    clamp_set;
+        type    cellSet;
+        action  add;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name clamp_4;
+        };
+    }
+    {
+        name    clamp_set;
+        type    cellSet;
+        action  add;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name clamp_5;
+        };
+    }
+    {
+        name    clamp_set;
+        type    cellSet;
+        action  add;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name clamp_6;
+        };
+    }
+    {
+      name    clamp_zone;
+      type    cellZoneSet;
+      action  new;
+      source  setToCellZone;
+      sourceInfo
+      {
+        set    clamp_set;
+      }
+    }
+
+
+    {
+        name    cover_set;
+        type    cellSet;
+        action  new;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name cover_27;
+        };
+    }
+    {
+        name    cover_set;
+        type    cellSet;
+        action  add;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name cover_28;
+        };
+    }
+    {
+        name    cover_set;
+        type    cellSet;
+        action  add;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name cover_29;
+        };
+    }
+    {
+        name    cover_set;
+        type    cellSet;
+        action  add;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name cover_30;
+        };
+    }
+    {
+        name    cover_set;
+        type    cellSet;
+        action  add;
+        source  zoneToCell;
+        sourceInfo
+        {
+          name cover_31;
+        };
+    }
+    {
+      name    cover_zone;
+      type    cellZoneSet;
+      action  new;
+      source  setToCellZone;
+      sourceInfo
+      {
+        set    cover_set;
+      }
+    }
+);
+
+// ************************************************************************* //

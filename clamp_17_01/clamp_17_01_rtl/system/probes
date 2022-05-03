@@ -1,0 +1,23 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Writes out values of fields from cells nearest to specified locations.
+
+\*---------------------------------------------------------------------------*/
+
+points  (
+  (4.5 2.85 0.05)
+  (4.5 2.5 0.05)
+  (4.5 1 0.05)
+);
+
+fields  (Tf Ts Qr);
+
+#includeEtc "caseDicts/postProcessing/probes/probes.cfg"
+
+// ************************************************************************* //
